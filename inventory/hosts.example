@@ -1,0 +1,14 @@
+#all:
+#  children:
+#    allpis:
+#      children:
+#        soundpis:
+#          hosts:
+#            somePi:
+#              ansible_host: 10.1.1.1
+#            someOtherPi:
+#              ansible_host: 10.1.1.2
+#        waterpis:
+#          hosts:
+#            splashPi:
+#              ansible_host: 10.1.1.3

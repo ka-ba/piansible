@@ -1,0 +1,20 @@
+---
+
+- name: have user account for {{ u_name }}
+  user:
+    comment: generate by ansible role haveuser
+    name: "{{ u_name }}"
+    state: present
+  become: yes
+
+- name: have my ssh key present
+  authorized_key:
+    exclusive: yes
+    key: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
+    state: present
+    user: "{{ u_name }}"
+  become: yes
+  when: u_ssh == true
+
+- name: CURRENTLY IGNORING VALUE OF u_sudo
+  debug: var=u_sudo

@@ -1,0 +1,16 @@
+---
+
+- hosts: allpis
+
+  vars:
+
+  remote_user: pi
+
+  tasks:
+
+  - name: have my ssh key present
+    authorized_key:
+      exclusive: yes
+      key: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
+      state: present
+      user: "{{ ansible_user }}"

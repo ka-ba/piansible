@@ -1,0 +1,13 @@
+---
+
+- hosts: soundpis
+
+  vars:
+
+  roles:
+  - soundpi
+
+  remote_user: pi
+
+  tasks:
+

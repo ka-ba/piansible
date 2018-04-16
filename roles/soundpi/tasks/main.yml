@@ -1,0 +1,99 @@
+# following http://www.knight-of-pi.org/raspberry-pi-as-wifi-jukebox-with-dlna-and-upnp-smartphone-controls/
+
+---
+
+- name: ensure basic packages
+  apt:
+   cache_valid_time: 43200
+   package:
+   - git
+   - libupnp-dev
+   - libgstreamer1.0-dev
+   - gstreamer1.0-libav
+   - gstreamer1.0-plugins-*
+   - gstreamer0.10-plugins-*
+   - pulseaudio
+   state: latest
+  become: yes
+
+- name: ensure git dir
+  file:
+    mode: u+rwx
+    path: ~/git
+    state: directory
+  remote_user: juke
+
+- name: retrieve gmrender-resurrect
+  git:
+    clone: yes
+    dest: ~/git/gmrender-resurrect/
+    repo: https://github.com/hzeller/gmrender-resurrect.git
+  remote_user: juke
+
+- name: autogen gmrender-resurrect
+  command: ./autogen.sh
+  args:
+    chdir: ~/git/gmrender-resurrect/
+  remote_user: juke
+
+- name: configure gmrender-resurrect
+  command: ./configure
+  args:
+    chdir: ~/git/gmrender-resurrect/
+  remote_user: juke
+
+- name: make gmrender-resurrect
+  make:
+    chdir: ~/git/gmrender-resurrect/
+    params:
+      NUM_THREADS: 4  # ansible_processor_vcpus is incorrect
+  remote_user: juke
+
+- name: note build dir
+  command: pwd
+  args:
+    chdir: ~/git/gmrender-resurrect/
+  register: builddir
+  remote_user: juke
+
+- name: install gmrender-resurrect
+  make:
+    chdir: "{{ builddir.stdout }}"
+    target: install
+  register: inst
+  become: yes
+
+- name: configure for pulseaudio auto-start
+  cron:
+    backup: yes
+    job: pulseaudio --start
+    name: "start pulseaudio"
+    special_time : reboot
+    state: present
+    user: root
+  become: yes
+
+- name: configure for gmediarender auto-start
+  cron:
+    backup: yes
+    job: /usr/local/bin/gmediarender -f "{{ inventory_hostname_short }}" -u "{{ inventory_hostname_short }}-{{ ansible_machine_id }}"
+    name: "start gmediarender"
+    special_time : reboot
+    state: present
+    user: root
+  become: yes
+
+- name: reboot after installation
+  shell: sleep 1 ; reboot
+  async: 1
+  poll: 0
+  ignore_errors: true
+  become: yes
+  when: inst.changed
+
+- name: wait for target to come back on line after reboot
+  wait_for_connection:
+    delay: 10
+  when: inst.changed
+
+# facts should still be acceptable

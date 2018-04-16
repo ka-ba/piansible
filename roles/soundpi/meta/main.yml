@@ -1,0 +1,3 @@
+---
+dependencies:
+- { role: haveuser, u_name: juke, u_ssh: true, u_sudo: false }

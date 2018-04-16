@@ -1,0 +1,3 @@
+Bit of [Ansible](http://docs.ansible.com/ansible/latest/) stuff to do basic set-up on [Raspberry Pis](https://www.raspberrypi.org/) (and, presumably, other flavours as well) and to set them up as UPNP/DLNA media player as described in this [post](http://www.knight-of-pi.org/raspberry-pi-as-wifi-jukebox-with-dlna-and-upnp-smartphone-controls/).
+
+You have to make up your own host file, following the example.

@@ -1,0 +1,29 @@
+---
+
+- hosts: allpis
+
+  vars:
+
+  remote_user: pi
+
+  tasks:
+
+#  - name: show inventory_hostname_short
+#    debug: var=inventory_hostname_short
+
+#  - name: stop here
+#    fail: msg="stop"
+
+  - name: have correct hostname
+    hostname:
+      name: "{{ inventory_hostname_short }}"
+    become: yes
+
+  - name: REMINDER - resize root partition
+    debug: msg="REMINDER - resize root partition"
+
+  - name: update all packages - 3h interval
+    apt:
+      cache_valid_time: 10800
+      upgrade: safe
+    become: yes
